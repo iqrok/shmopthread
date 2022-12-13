@@ -20,8 +20,13 @@ set(LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib")
 set(SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(BUILD_DIR "${CMAKE_CURRENT_SOURCE_DIR}/build")
 
+# link lib pthread
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
+link_libraries(Threads::Threads)
+
+# link lib rt (realtime), for shm_op and shm_unlink
+link_libraries(rt)
 
 include_directories("${INCLUDE_DIR}")
 
@@ -42,12 +47,4 @@ set_target_properties("${OUTPUT_LIB_SHMOPTHREAD}_STATIC" PROPERTIES OUTPUT_NAME 
 add_library("${OUTPUT_LIB_SHMOPTHREAD}_SHARED" SHARED "${OBJLIB}")
 set_target_properties("${OUTPUT_LIB_SHMOPTHREAD}_SHARED" PROPERTIES OUTPUT_NAME "${OUTPUT_LIB_SHMOPTHREAD}")
 
-# example write
-SET(OUTPUT_BINARY_TEST_WRITE "test-write")
-SET(SOURCE_FILES_TEST_WRITE "${CMAKE_CURRENT_SOURCE_DIR}/example/write.cpp")
-add_executable("${OUTPUT_BINARY_TEST_WRITE}" "${SOURCE_FILES_TEST_WRITE}" "${OBJLIB}")
-
-# example write
-SET(OUTPUT_BINARY_TEST_READ "test-read")
-SET(SOURCE_FILES_TEST_READ "${CMAKE_CURRENT_SOURCE_DIR}/example/read.cpp")
-add_executable("${OUTPUT_BINARY_TEST_READ}" "${SOURCE_FILES_TEST_READ}" "${OBJLIB}")
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/example")
