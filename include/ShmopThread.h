@@ -1,3 +1,6 @@
+#ifndef _SHMOPTHREAD_H_
+#define _SHMOPTHREAD_H_
+
 extern "C" {
 
 #include <fcntl.h>
@@ -65,3 +68,5 @@ class ShmopThread {
 		void wait_for_given_periods(struct timespec*);
 		void threaded_routine(struct timespec*);
 };
+
+#endif
