@@ -44,13 +44,17 @@ class ShmopThread {
 		void set_data(void*);
 		void get_data(void*);
 
+		void join(void);
+		void detach(void);
+
 		void set_thread_mode(uint8_t);
+
+		uint32_t data_size;
 
 	private:
 		int oflag;
 		int prot;
 		mode_t mode;
-		uint32_t data_size;
 		uint64_t period_ns;
 		uint8_t direction;
 		uint8_t thread_mode;
@@ -62,11 +66,15 @@ class ShmopThread {
 		void *ptr;
 		void *data;
 
+		std::thread thrd;
 		pthread_t thread_handler;
+		struct timespec wakeup_time;
 
 		void set_default_value(void);
 		void wait_for_given_periods(struct timespec*);
 		void threaded_routine(struct timespec*);
+
+		void (*thread_fn)(void *p_data);
 };
 
 #endif

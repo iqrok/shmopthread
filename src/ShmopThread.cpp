@@ -13,8 +13,12 @@ extern "C" {
 #include "ShmopThread.h"
 
 #define NSEC_PER_SEC 1000000000
+#define MAX_SAFE_STACK 1024
 
-void (*thread_fn)(void *p_data);
+void stack_prefault(void){
+	unsigned char dummy[MAX_SAFE_STACK];
+	memset(dummy, 0, MAX_SAFE_STACK);
+}
 
 ShmopThread::ShmopThread(){
 	set_default_value();
@@ -133,12 +137,12 @@ int ShmopThread::start(void){
 		perror("Failed at truncate!");
 	}
 
-	struct timespec wakeup_time;
-
 	ptr = mmap(NULL, data_size, prot, MAP_SHARED, fd, 0);
 
 	// close file descriptor
 	close(fd);
+
+	stack_prefault();
 
 	clock_gettime(CLOCK_MONOTONIC, &wakeup_time);
 	wakeup_time.tv_sec += 1; // start in future +1 sec
@@ -146,25 +150,26 @@ int ShmopThread::start(void){
 
 	isOpen = true;
 
-	std::thread thrd = std::thread(
+	thrd = std::thread(
 			&ShmopThread::threaded_routine,
 			this,
 			&wakeup_time
 		);
+	//~ thrd = std::thread([this](){
+			//~ this->threaded_routine(&this->wakeup_time);
+		//~ });
 
 	thread_handler = thrd.native_handle();
 
-	switch(thread_mode){
-		case THREAD_MODE_DETACHED:
-			thrd.detach();
-			break;
-
-		case THREAD_MODE_JOINED:
-			thrd.join();
-			break;
-
-		default: break;
-	}
+	thrd.detach();
 
 	return fd;
+}
+
+void ShmopThread::join(void){
+	thrd.join();
+}
+
+void ShmopThread::detach(void){
+	thrd.detach();
 }
