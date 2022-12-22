@@ -39,15 +39,16 @@ class ShmopThread {
 
 		uint32_t get_byte_size();
 
-		void attach(void (*)(void*));
+		void attach_data(void*);
+		void attach_callback(void (*)(void*));
 
 		void* init(void);
 		int uninit(void);
 		int start(void);
 		int stop(void);
 
-		void set_data(void*);
-		void get_data(void*);
+		void read(void*);
+		void write(void*);
 
 	private:
 		int oflag;

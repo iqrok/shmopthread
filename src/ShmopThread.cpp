@@ -87,29 +87,33 @@ void ShmopThread::set_period_ms(uint32_t t_ms){
 	period_ns = t_ms * 1E6;
 }
 
-void ShmopThread::set_data(void *_data){
-	data = _data;
-}
-
-void ShmopThread::get_data(void *_data){
-	memcpy(_data, ptr, byte_size);
-}
-
 void ShmopThread::set_direction(uint8_t _direction){
 	direction = _direction;
-}
-
-void ShmopThread::attach(void (*fn)(void*)) {
-	thread_fn = fn;
 }
 
 void ShmopThread::set_thread_mode(uint8_t _thread_mode) {
 	thread_mode = _thread_mode;
 }
 
+void ShmopThread::attach_data(void *_data){
+	data = _data;
+}
+
+void ShmopThread::attach_callback(void (*fn)(void*)) {
+	thread_fn = fn;
+}
+
 uint32_t ShmopThread::get_byte_size(){
 	return byte_size;
 };
+
+void ShmopThread::read(void *res){
+	memcpy(res, ptr, byte_size);
+}
+
+void ShmopThread::write(void *req){
+	memcpy(ptr, req, byte_size);
+}
 
 void ShmopThread::wait_for_given_periods(struct timespec *wakeup_time){
 	clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, wakeup_time, NULL);
