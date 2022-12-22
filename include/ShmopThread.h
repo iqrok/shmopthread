@@ -28,28 +28,26 @@ class ShmopThread {
 		void set_flag(int);
 		void set_prot(int);
 		void set_mode(mode_t);
-		void set_data_size(uint32_t);
+		void set_byte_size(uint32_t);
 		void set_addr(int);
 		void set_direction(uint8_t);
+		void set_thread_mode(uint8_t);
 
 		void set_period_ns(uint64_t);
 		void set_period_ms(uint32_t);
 		void set_period_us(uint32_t);
 
+		uint32_t get_byte_size();
+
 		void attach(void (*)(void*));
 
+		void* init(void);
+		int uninit(void);
 		int start(void);
 		int stop(void);
 
 		void set_data(void*);
 		void get_data(void*);
-
-		void join(void);
-		void detach(void);
-
-		void set_thread_mode(uint8_t);
-
-		uint32_t data_size;
 
 	private:
 		int oflag;
@@ -59,8 +57,10 @@ class ShmopThread {
 		uint8_t direction;
 		uint8_t thread_mode;
 		const char *fname;
+		uint32_t byte_size;
 
 		bool isOpen;
+		bool isInitialized;
 
 		int fd;
 		void *ptr;
