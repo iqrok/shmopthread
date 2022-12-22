@@ -31,7 +31,7 @@ void callback(void *p_data){
 void callback2(void *p_data){
 	buf3[0]--;
 
-	for(uint8_t idx = 0; idx < 32; idx++){
+	for(uint8_t idx = 0; idx < 16; idx++){
 		printf("0x%02x ", buf3[idx]);
 
 		//~ if(buf2[idx - 1] % 0x10) continue;
@@ -64,8 +64,8 @@ int main(void){
 	pShm->set_thread_mode(THREAD_MODE_DETACHED);
 	pShm->set_period_us(25000);
 	pShm->set_byte_size(16);
-	pShm->set_data(buf2);
-	pShm->attach(callback);
+	pShm->attach_data(buf2);
+	pShm->attach_callback(callback);
 
 	pShm2.set_file_name("shm-in.tmp");
 	pShm2.set_flag(O_CREAT | O_RDWR);
@@ -74,9 +74,9 @@ int main(void){
 	pShm2.set_prot(PROT_READ|PROT_WRITE);
 	pShm2.set_thread_mode(THREAD_MODE_DETACHED);
 	pShm2.set_period_us(50000);
-	pShm2.set_byte_size(32);
-	pShm2.set_data(buf3);
-	pShm2.attach(callback2);
+	pShm2.set_byte_size(16);
+	pShm2.attach_data(buf3);
+	pShm2.attach_callback(callback2);
 
 	printf("pSHm: %d, pShm2: %d\n",pShm->get_byte_size(),pShm2.get_byte_size());
 

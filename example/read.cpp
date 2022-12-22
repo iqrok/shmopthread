@@ -15,7 +15,7 @@ ShmopThread pShm;
 uint8_t *buf2;
 
 void callback(void *p_data){
-	pShm.get_data(buf2);
+	pShm.read(buf2);
 	//~ printf("Callback\n");
 	//~ for(uint8_t idx = 0; idx < 16; idx++){
 		//~ printf("0x%02x ", buf2[idx]);
@@ -40,15 +40,15 @@ int main(void){
 	pShm.set_period_ms(100);
 	pShm.set_byte_size(16);
 	//~ pShm.set_byte_size(sizeof(SharedData));
-	pShm.set_data(buf2);
-	pShm.attach(callback);
+	pShm.attach_data(buf2);
+	pShm.attach_callback(callback);
 
 	printf("SIZE: 0x%02ld\n", sizeof(buf2));
 	pShm.init();
 
 	printf("SIZE: 0x%02ld\n", sizeof(*buf2));
 	while(1){
-		pShm.get_data(buf2);
+		pShm.read(buf2);
 		for(uint8_t idx = 0; idx < pShm.get_byte_size(); idx++){
 			printf("0x%02x ", buf2[idx]);
 		}
