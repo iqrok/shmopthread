@@ -25,7 +25,7 @@ ShmopThread::ShmopThread(){
 }
 
 void ShmopThread::threaded_routine(struct timespec *wakeup_time){
-	while(1){
+	while(isOpen){
 		(*thread_fn)(ptr);
 
 		switch (direction){
@@ -157,11 +157,11 @@ void* ShmopThread::init(void){
 int ShmopThread::stop(void){
 	if(isInitialized) uninit();
 
+	isOpen = false;
+
 	if(thread_mode != THREAD_MODE_DETACHED) thrd.join();
 
 	if(isOpen) pthread_cancel(thread_handler);
-
-	isOpen = false;
 
 	return fd;
 }
@@ -170,6 +170,8 @@ int ShmopThread::start(void){
 	if(!isInitialized) init();
 
 	stack_prefault();
+
+	isOpen = true;
 
 	clock_gettime(CLOCK_MONOTONIC, &wakeup_time);
 	wakeup_time.tv_sec += 1; // start in future +1 sec
@@ -182,8 +184,6 @@ int ShmopThread::start(void){
 		);
 
 	thread_handler = thrd.native_handle();
-
-	isOpen = true;
 
 	if(thread_mode == THREAD_MODE_DETACHED) thrd.detach();
 
