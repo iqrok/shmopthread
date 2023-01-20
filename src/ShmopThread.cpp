@@ -73,7 +73,6 @@ void ShmopThread::set_mode(mode_t _mode){
 
 void ShmopThread::set_byte_size(uint32_t _byte_size){
 	byte_size = _byte_size;
-	this->data = (void*) (new char[byte_size]);
 }
 
 void ShmopThread::set_period_ns(uint64_t t_ns){
