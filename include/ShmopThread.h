@@ -50,6 +50,9 @@ class ShmopThread {
 		void read(void*);
 		void write(void*);
 
+		void read(void);
+		void write(void);
+
 	private:
 		int oflag;
 		int prot;

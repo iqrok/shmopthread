@@ -26,7 +26,7 @@ ShmopThread::ShmopThread(){
 
 void ShmopThread::threaded_routine(struct timespec *wakeup_time){
 	while(isOpen){
-		(*thread_fn)(ptr);
+		if(thread_fn) (*thread_fn)(ptr);
 
 		switch (direction){
 			case DIRECTION_READ:
@@ -115,6 +115,14 @@ void ShmopThread::write(void *req){
 	memcpy(ptr, req, byte_size);
 }
 
+void ShmopThread::read(void){
+	memcpy(data, ptr, byte_size);
+}
+
+void ShmopThread::write(void){
+	memcpy(ptr, data, byte_size);
+}
+
 void ShmopThread::wait_for_given_periods(struct timespec *wakeup_time){
 	clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, wakeup_time, NULL);
 
@@ -150,6 +158,7 @@ void* ShmopThread::init(void){
 	close(fd);
 
 	isInitialized = true;
+	thread_fn = nullptr;
 
 	return ptr;
 }
