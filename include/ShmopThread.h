@@ -32,6 +32,7 @@ class ShmopThread {
 		void set_addr(int);
 		void set_direction(uint8_t);
 		void set_thread_mode(uint8_t);
+		void set_preserve_link(bool);
 
 		void set_period_ns(uint64_t);
 		void set_period_ms(uint32_t);
@@ -54,6 +55,7 @@ class ShmopThread {
 		void write(void);
 
 	private:
+		bool preserve_link;
 		int oflag;
 		int prot;
 		mode_t mode;

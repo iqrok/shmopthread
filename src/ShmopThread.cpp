@@ -47,6 +47,7 @@ void ShmopThread::threaded_routine(struct timespec *wakeup_time){
 void ShmopThread::set_default_value(void){
 	direction = DIRECTION_READ;
 	thread_mode = THREAD_MODE_JOINED;
+	preserve_link = true;
 	isOpen = false;
 	isInitialized = false;
 }
@@ -95,6 +96,10 @@ void ShmopThread::set_thread_mode(uint8_t _thread_mode) {
 	thread_mode = _thread_mode;
 }
 
+void ShmopThread::set_preserve_link(bool _preserve_link) {
+	preserve_link = _preserve_link;
+}
+
 void ShmopThread::attach_data(void *_data){
 	data = _data;
 }
@@ -134,8 +139,8 @@ void ShmopThread::wait_for_given_periods(struct timespec *wakeup_time){
 }
 
 int ShmopThread::uninit(void){
-	if((fd = shm_unlink(fname))){
-		perror("shm open failed");
+	if(preserve_link == false){
+		if((fd = shm_unlink(fname))) perror("shm open failed");
 	}
 
 	isInitialized = false;
