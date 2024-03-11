@@ -1,13 +1,12 @@
 extern "C" {
 
 #include <errno.h>
-#include <unistd.h>
-#include <sys/time.h>
-#include <time.h> /* clock_gettime() */
+#include <string.h>
 #include <sys/resource.h>
 #include <sys/stat.h>
-#include <string.h>
-
+#include <sys/time.h>
+#include <time.h> /* clock_gettime() */
+#include <unistd.h>
 }
 
 #include "ShmopThread.h"
@@ -15,36 +14,41 @@ extern "C" {
 #define NSEC_PER_SEC 1000000000
 #define MAX_SAFE_STACK 1024
 
-void stack_prefault(void){
+void stack_prefault(void)
+{
 	unsigned char dummy[MAX_SAFE_STACK];
 	memset(dummy, 0, MAX_SAFE_STACK);
 }
 
-ShmopThread::ShmopThread(){
+ShmopThread::ShmopThread()
+{
 	set_default_value();
 }
 
-void ShmopThread::threaded_routine(struct timespec *wakeup_time){
-	while(isOpen){
-		if(thread_fn) (*thread_fn)(ptr);
+void ShmopThread::threaded_routine(struct timespec* wakeup_time)
+{
+	while (isOpen) {
+		if (thread_fn) (*thread_fn)(ptr);
 
-		switch (direction){
-			case DIRECTION_READ:
-				memcpy(data, ptr, byte_size);
-				break;
+		switch (direction) {
+		case DIRECTION_READ:
+			memcpy(data, ptr, byte_size);
+			break;
 
-			case DIRECTION_WRITE:
-				memcpy(ptr, data, byte_size);
-				break;
+		case DIRECTION_WRITE:
+			memcpy(ptr, data, byte_size);
+			break;
 
-			default: break;
+		default:
+			break;
 		}
 
 		wait_for_given_periods(wakeup_time);
 	}
 }
 
-void ShmopThread::set_default_value(void){
+void ShmopThread::set_default_value(void)
+{
 	direction = DIRECTION_READ;
 	thread_mode = THREAD_MODE_JOINED;
 	preserve_link = true;
@@ -52,83 +56,103 @@ void ShmopThread::set_default_value(void){
 	isInitialized = false;
 }
 
-void ShmopThread::set_file_name(std::string _fname){
+void ShmopThread::set_file_name(std::string _fname)
+{
 	fname = _fname.c_str();
 }
 
-void ShmopThread::set_file_name(const char * _fname){
+void ShmopThread::set_file_name(const char* _fname)
+{
 	fname = _fname;
 }
 
-void ShmopThread::set_flag(int _oflag){
+void ShmopThread::set_flag(int _oflag)
+{
 	oflag = _oflag;
 }
 
-void ShmopThread::set_prot(int _prot){
+void ShmopThread::set_prot(int _prot)
+{
 	prot = _prot;
 }
 
-void ShmopThread::set_mode(mode_t _mode){
+void ShmopThread::set_mode(mode_t _mode)
+{
 	mode = _mode;
 }
 
-void ShmopThread::set_byte_size(uint32_t _byte_size){
+void ShmopThread::set_byte_size(uint32_t _byte_size)
+{
 	byte_size = _byte_size;
 }
 
-void ShmopThread::set_period_ns(uint64_t t_ns){
+void ShmopThread::set_period_ns(uint64_t t_ns)
+{
 	period_ns = t_ns;
 }
 
-void ShmopThread::set_period_us(uint32_t t_us){
+void ShmopThread::set_period_us(uint32_t t_us)
+{
 	period_ns = t_us * 1E3;
 }
 
-void ShmopThread::set_period_ms(uint32_t t_ms){
+void ShmopThread::set_period_ms(uint32_t t_ms)
+{
 	period_ns = t_ms * 1E6;
 }
 
-void ShmopThread::set_direction(uint8_t _direction){
+void ShmopThread::set_direction(uint8_t _direction)
+{
 	direction = _direction;
 }
 
-void ShmopThread::set_thread_mode(uint8_t _thread_mode) {
+void ShmopThread::set_thread_mode(uint8_t _thread_mode)
+{
 	thread_mode = _thread_mode;
 }
 
-void ShmopThread::set_preserve_link(bool _preserve_link) {
+void ShmopThread::set_preserve_link(bool _preserve_link)
+{
 	preserve_link = _preserve_link;
 }
 
-void ShmopThread::attach_data(void *_data){
+void ShmopThread::attach_data(void* _data)
+{
 	data = _data;
 }
 
-void ShmopThread::attach_callback(void (*fn)(void*)) {
+void ShmopThread::attach_callback(void (*fn)(void*))
+{
 	thread_fn = fn;
 }
 
-uint32_t ShmopThread::get_byte_size(){
+uint32_t ShmopThread::get_byte_size()
+{
 	return byte_size;
 };
 
-void ShmopThread::read(void *res){
+void ShmopThread::read(void* res)
+{
 	memcpy(res, ptr, byte_size);
 }
 
-void ShmopThread::write(void *req){
+void ShmopThread::write(void* req)
+{
 	memcpy(ptr, req, byte_size);
 }
 
-void ShmopThread::read(void){
+void ShmopThread::read(void)
+{
 	memcpy(data, ptr, byte_size);
 }
 
-void ShmopThread::write(void){
+void ShmopThread::write(void)
+{
 	memcpy(ptr, data, byte_size);
 }
 
-void ShmopThread::wait_for_given_periods(struct timespec *wakeup_time){
+void ShmopThread::wait_for_given_periods(struct timespec* wakeup_time)
+{
 	clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, wakeup_time, NULL);
 
 	wakeup_time->tv_nsec += period_ns;
@@ -138,9 +162,10 @@ void ShmopThread::wait_for_given_periods(struct timespec *wakeup_time){
 	}
 }
 
-int ShmopThread::uninit(void){
-	if(preserve_link == false){
-		if((fd = shm_unlink(fname))) perror("shm open failed");
+int ShmopThread::uninit(void)
+{
+	if (preserve_link == false) {
+		if ((fd = shm_unlink(fname))) perror("shm open failed");
 	}
 
 	isInitialized = false;
@@ -148,12 +173,13 @@ int ShmopThread::uninit(void){
 	return fd;
 }
 
-void* ShmopThread::init(void){
-	if((fd = shm_open(fname, oflag, mode)) < 0){
+void* ShmopThread::init(void)
+{
+	if ((fd = shm_open(fname, oflag, mode)) < 0) {
 		perror("shm open failed!");
 	}
 
-	if(ftruncate(fd, byte_size) < 0){
+	if (ftruncate(fd, byte_size) < 0) {
 		perror("Failed at truncate!");
 	}
 
@@ -168,20 +194,22 @@ void* ShmopThread::init(void){
 	return ptr;
 }
 
-int ShmopThread::stop(void){
-	if(isInitialized) uninit();
+int ShmopThread::stop(void)
+{
+	if (isInitialized) uninit();
 
 	isOpen = false;
 
-	if(thread_mode != THREAD_MODE_DETACHED) thrd.join();
+	if (thread_mode != THREAD_MODE_DETACHED) thrd.join();
 
-	if(isOpen) pthread_cancel(thread_handler);
+	if (isOpen) pthread_cancel(thread_handler);
 
 	return fd;
 }
 
-int ShmopThread::start(void){
-	if(!isInitialized) init();
+int ShmopThread::start(void)
+{
+	if (!isInitialized) init();
 
 	stack_prefault();
 
@@ -191,15 +219,11 @@ int ShmopThread::start(void){
 	wakeup_time.tv_sec += 1; // start in future +1 sec
 	wakeup_time.tv_nsec = 0;
 
-	thrd = std::thread(
-			&ShmopThread::threaded_routine,
-			this,
-			&wakeup_time
-		);
+	thrd = std::thread(&ShmopThread::threaded_routine, this, &wakeup_time);
 
 	thread_handler = thrd.native_handle();
 
-	if(thread_mode == THREAD_MODE_DETACHED) thrd.detach();
+	if (thread_mode == THREAD_MODE_DETACHED) thrd.detach();
 
 	return fd;
 }
