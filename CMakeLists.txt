@@ -1,19 +1,25 @@
 cmake_minimum_required(VERSION 3.13)
 
 set(PROJECT_NAME "ShmopThread")
-set(PROJECT_VERSION "0.0.1")
+set(PROJECT_VERSION "0.1.0")
 
 project("${PROJECT_NAME}")
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20 -O2")
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	add_compile_options (-fdiagnostics-color=always)
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 	add_compile_options (-fcolor-diagnostics)
 endif ()
+
+add_compile_options(
+	"-Wall"
+	"-Wfatal-errors"
+	"-fexceptions"
+	"-Wpedantic"
+	"-O2")
 
 set(INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include")
 set(LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib")
@@ -47,4 +53,6 @@ set_target_properties("${OUTPUT_LIB_SHMOPTHREAD}_STATIC" PROPERTIES OUTPUT_NAME 
 add_library("${OUTPUT_LIB_SHMOPTHREAD}_SHARED" SHARED "${OBJLIB}")
 set_target_properties("${OUTPUT_LIB_SHMOPTHREAD}_SHARED" PROPERTIES OUTPUT_NAME "${OUTPUT_LIB_SHMOPTHREAD}")
 
-add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/example")
+if(BUILD_TEST)
+	add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/example")
+endif ()
